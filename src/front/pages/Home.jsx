@@ -1,6 +1,7 @@
 // src/pages/Home.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../components/Card.jsx";
+import { Carousel } from "../components/Carousel";
 
 export const Home = () => {
   const womenProducts = [
@@ -32,42 +33,47 @@ export const Home = () => {
   };
 
   return (
-    <div className="container my-5">
-      <section className="mb-5">
-        <h2 className="fw-semibold mb-4">Mujer</h2>
-        <div className="row g-4">
-          {womenProducts.map((product) => (
-            <div key={product.id} className="col-12 col-md-4">
-              <Card
-                id={product.id}
-                name={product.name}
-                price={product.price}
-                image={product.image}
-                isFavorite={favorites.includes(product.id)}
-                onToggleFavorite={() => toggleFavorite(product.id)}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
+    <>
+      <Carousel />
 
-      <section className="mb-5">
-        <h2 className="fw-semibold mb-4">Hombre</h2>
-        <div className="row g-4">
-          {menProducts.map((product) => (
-            <div key={product.id} className="col-12 col-md-4">
-              <Card
-                id={product.id}
-                name={product.name}
-                price={product.price}
-                image={product.image}
-                isFavorite={favorites.includes(product.id)}
-                onToggleFavorite={() => toggleFavorite(product.id)}
-              />
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+      <div className="container my-5">
+        <section className="mb-5">
+          <h2 className="fw-semibold mb-4">Mujer</h2>
+          <div className="row g-4">
+            {womenProducts.map((product) => (
+              <div key={product.id} className="col-12 col-md-4">
+                <Card
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  image={product.image}
+                  isFavorite={favorites.includes(product.id)}
+                  onToggleFavorite={() => toggleFavorite(product.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-5">
+          <h2 className="fw-semibold mb-4">Hombre</h2>
+          <div className="row g-4">
+            {menProducts.map((product) => (
+              <div key={product.id} className="col-12 col-md-4">
+                <Card
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  image={product.image}
+                  isFavorite={favorites.includes(product.id)}
+                  onToggleFavorite={() => toggleFavorite(product.id)}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </>
   );
 };
+
