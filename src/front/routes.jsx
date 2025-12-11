@@ -14,6 +14,8 @@ import { ProductDetails } from "./components/ProductDetails";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Private } from "./pages/Private";
+import { Carrito } from "./pages/Carrito";
+import { Checkout } from "./pages/Checkout";
 
 const logged = true;
 export const router = createBrowserRouter(
@@ -34,6 +36,8 @@ export const router = createBrowserRouter(
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="carrito" element={<Carrito />} />
+      <Route path="/checkout" element={<Checkout />} />
 
       {logged
         ? <Route path="/private" element={<Private />} />

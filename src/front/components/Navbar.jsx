@@ -5,16 +5,39 @@ import { FaUser } from "react-icons/fa";
 import { LuShoppingCart } from "react-icons/lu";
 import { FaRegHeart } from "react-icons/fa6";
 import { IoExitOutline } from "react-icons/io5";
+import React, { useState } from "react";
 
+export const Navbar = ({ cart }) => {
 
-export const Navbar = () => {
+	const [searchTerm, setSearchTerm] = useState("");
 
 	const navigate = useNavigate();
+
+	//search
+	const handleSearch = () => {
+
+		const allProducts = [
+			{ id: 1, name: "Vestido elegante" },
+			{ id: 2, name: "Traje clásico" }
+		];
+
+		const found = allProducts.find(p =>
+			p.name.toLowerCase() === searchTerm.toLowerCase()
+		);
+
+		if (found) {
+			navigate(`/product/${found.id}`);
+		} else {
+			alert("Producto no encontrado");
+		}
+	};
 
 	const handleLogout = () => {
 		localStorage.removeItem("logged");
 		navigate("/login");
 	};
+
+	const totalItems = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
 
 	return (
 		<nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -31,8 +54,13 @@ export const Navbar = () => {
 
 					<form className="d-flex mx-auto position-relative w-50" role="search">
 						<label htmlFor="searchInput" className="visually-hidden">Buscar productos</label>
-						<FaSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
-						<input id="searchInput" className="form-control rounded-pill ps-5 border-dark" type="search" placeholder="Buscar productos" aria-label="Buscar" />
+
+						<button type="button" onClick={handleSearch} className="position-absolute top-50 start-0 translate-middle-y ms-3 btn btn-link p-0"
+							style={{ color: "#6c757d" }}><FaSearch />
+						</button>
+
+						<input id="searchInput" className="form-control rounded-pill ps-5 border-dark" type="search" placeholder="Buscar productos"
+							aria-label="Buscar" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSearch(); } }} />
 					</form>
 
 
@@ -66,13 +94,20 @@ export const Navbar = () => {
 							</ul>
 						</li>
 
-						<li className="nav-item">
-							<Link className="nav-link" to="/carrito"><LuShoppingCart /></Link>
+						<li className="nav-item position-relative me-3">
+							<Link className="nav-link" to="/carrito"> <LuShoppingCart className="icono-carrito" style={{ fontSize: "20px" }} /></Link>
+
+							{totalItems > 0 && (
+								<span className="badge bg-dark text-white position-absolute top-0 start-100 translate-middle mt-2" style={{ width: "20px", height: "15px", fontSize: "10px", padding: "0" }}>
+									{totalItems}
+								</span>
+							)}
 						</li>
 
 						<li className="nav-item ms-auto">
 							<Link className="nav-link" to="/login"> <FaUser /> <IoExitOutline className="" onClick={handleLogout} /></Link>
 						</li>
+
 					</ul>
 				</div>
 			</div>
