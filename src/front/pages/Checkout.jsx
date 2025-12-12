@@ -1,19 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const Checkout = () => {
 
-    const { cart } = useOutletContext();
+    const { cart, setCart } = useOutletContext();
+    const navigate = useNavigate();
 
+    //Datos del form
     const [formData, setFormData] = useState({
         nombre: "",
         direccion: "",
+        comuna: "",
         ciudad: "",
         region: "",
+        pais: "",
         postal: "",
         telefono: "",
         metodoPago: "tarjeta"
     });
+
+    //resumen pedido
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,12 +35,15 @@ export const Checkout = () => {
     const shipping = 9.99;
     const total = subtotal + shipping;
 
+    //carrito
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("Datos de envío:", formData);
         console.log("Carrito:", cart);
-        alert("Pedido realizado");
+
+        setCart([]);
+        navigate("/comprar")
     };
 
     return (
@@ -53,20 +63,30 @@ export const Checkout = () => {
                         </div>
 
                         <div className="mb-3">
-                            <label className="form-label"> Dirección </label>
+                            <label className="form-label"> Dirección (Avenida / Calle / Número de casa o departamento)</label>
                             <input type="text" className="form-control" name="direccion" value={formData.direccion} onChange={handleChange} required />
                         </div>
 
                         <div className="row">
 
                             <div className="col-md-6 mb-3">
-                                <label className="form-label">Ciudad </label>
+                                <label className="form-label">Comuna</label>
+                                <input type="text" className="form-control" name="comuna" value={formData.comuna} onChange={handleChange} required />
+                            </div>
+
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label">Ciudad</label>
                                 <input type="text" className="form-control" name="ciudad" value={formData.ciudad} onChange={handleChange} required />
                             </div>
 
                             <div className="col-md-6 mb-3">
-                                <label className="form-label">Región </label>
+                                <label className="form-label">Región</label>
                                 <input type="text" className="form-control" name="region" value={formData.region} onChange={handleChange} required />
+                            </div>
+
+                            <div className="col-md-6 mb-3">
+                                <label className="form-label">País</label>
+                                <input type="text" className="form-control" name="pais" value={formData.pais} onChange={handleChange} required />
                             </div>
 
                         </div>
@@ -75,12 +95,12 @@ export const Checkout = () => {
 
                             <div className="col-md-6 mb-3">
                                 <label className="form-label">Código Postal </label>
-                                <input type="text" className="form-control" name="postal" value={formData.postal} onChange={handleChange} required />
+                                <input type="text" pattern="[0-9]*" className="form-control" name="postal" value={formData.postal} onChange={handleChange} required />
                             </div>
 
                             <div className="col-md-6 mb-3">
                                 <label className="form-label">Teléfono </label>
-                                <input type="text" className="form-control" name="telefono" value={formData.telefono} onChange={handleChange} required />
+                                <input type="tel" pattern="[0-9]+" className="form-control" name="telefono" value={formData.telefono} onChange={handleChange} required />
                             </div>
 
                         </div>
@@ -109,15 +129,11 @@ export const Checkout = () => {
                                 <input className="form-check-input" type="radio" name="metodoPago" value="transferencia" checked={formData.metodoPago === "transferencia"} onChange={handleChange}
                                     id="metodo-transferencia" />
 
-                                <label className="form-check-label" htmlFor="metodo-transferencia">
-                                    Transferencia Bancaria
-                                </label>
+                                <label className="form-check-label" htmlFor="metodo-transferencia"> Transferencia Bancaria</label>
                             </div>
 
                         </div>
-                        <button type="submit" className="btn btn-dark mt-4 w-100">
-                            Comprar
-                        </button>
+                        <button type="submit" className="btn btn-dark mt-4 w-100"> Comprar </button>
 
                     </form>
                 </div>
