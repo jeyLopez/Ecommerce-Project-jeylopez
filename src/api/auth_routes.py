@@ -6,12 +6,12 @@ from api.models import db, User
 from datetime import datetime, timedelta
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.utils import generate_sitemap, APIException
-from flask_cors import CORS
+#from flask_cors import CORS
 
 auth = Blueprint('auth', __name__)
 
 # Allow CORS requests to this API
-CORS(auth)
+#CORS(auth)
 
 
 @auth.route('/hello', methods=['POST', 'GET'])
