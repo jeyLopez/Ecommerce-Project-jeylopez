@@ -16,12 +16,9 @@ import { Admin } from "./pages/Admin";
 import { Variants } from "./pages/Variants";
 import { Orders } from "./pages/Orders";
 import { Users } from "./pages/Users";
-
-
-
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
-import { Private } from "./pages/Private";
+import { Profile } from "./pages/Profile";
 import { Carrito } from "./pages/Carrito";
 import { Checkout } from "./pages/Checkout";
 import { Comprar } from "./pages/Comprar";
@@ -35,25 +32,16 @@ export const router = createBrowserRouter(
 
 
       <Route index element={<Home />} />
-
-
       <Route path="single/:theId" element={<Single />} />
       <Route path="demo" element={<Demo />} />
-
-
       <Route path="favorites" element={<Favorites />} />
-
       <Route path="product/:id" element={<ProductDetails />} />
       <Route path="products" element={<ProductsList />} />
-
       <Route path="admin" element={<Admin />}>
         <Route path="variants" element={<Variants />} />
         <Route path="orders" element={<Orders />} />
         <Route path="users" element={<Users />} />
       </Route>
-
-
-
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
       {/* Nested Routes: Defines sub-routes within the BaseHome component. */}
@@ -68,8 +56,8 @@ export const router = createBrowserRouter(
       <Route path="/comprar" element={<Comprar />} />
 
       {logged
-        ? <Route path="private" element={<Private />} />
-        : <Route path="private" element={<Navigate to="/login" />} />
+        ? <Route path="profile" element={<Profile />} />
+        : <Route path="profile" element={<Navigate to="/login" />} />
       }
 
     </Route>

@@ -38,7 +38,7 @@ export const Login = () => {
         payload: { token, user },
       });
 
-      navigate("/private");
+      navigate("/profile");
     } catch (error) {
       console.error(error);
       alert("Error en el servidor");
