@@ -146,7 +146,7 @@ export const ProductsList = () => {
     setOnlyInStock(false);
   };
 
-  // Si seleccionas una talla que ya no existe por el color, la quito automáticamente
+  // Si seleccionas una talla que ya no existe por el color, la quitamos automáticamente
   useEffect(() => {
     if (selectedSize && availableSizes.length && !availableSizes.includes(selectedSize)) {
       setSelectedSize(null);

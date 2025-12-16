@@ -64,7 +64,8 @@ export const fetchProducts = async (filters = {}) => {
   return [];
 };
 
-
+// 2) DETALLE de producto (ProductDetail)
+// GET /products/123
 export const fetchProductDetail = async (productId) => {
   if (!productId) throw new Error("productId is required");
 
