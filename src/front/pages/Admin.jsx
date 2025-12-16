@@ -1,10 +1,112 @@
-import React from "react";
-import { Link, useLocation, Outlet } from "react-router-dom";
+import React, { useState } from "react"; //estado-eb
+import { Link, useLocation, Outlet, useNavigate } from "react-router-dom"; //navegación-eb
 import { FaBox, FaLayerGroup, FaClipboardList, FaUsers } from "react-icons/fa";
 import { FaPlus, FaTrash, FaPen } from "react-icons/fa6";
 
 
 export const Admin = () => {
+
+  // estados formulario -eb
+
+  const [productName, setProductName] = useState('');
+  const [basePrice, setBasePrice] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [productImageFile, setProductImageFile] = useState(null);  //guarda img
+  const [productDescription, setProductDescription] = useState('');
+
+  // estados interfaz y feedback-eb
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
+  const [isCreating, setIsCreating] = useState(false);
+
+  const navigate = useNavigate();
+
+  // url backend
+  const API_URL = "https://potential-journey-455qr9vw4xph76qv-3001.app.github.dev/api";
+
+  // función doble, para subir y crear - eb
+
+  const handleCreateProduct = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccessMsg(null);
+
+    // Validaciones 
+    if (!productImageFile || !productName || !basePrice || !categoryId) {
+      setError("Debes llenar todos los campos y seleccionar una imagen.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+
+      //subir imagen a claudinary
+
+      const formData = new FormData();
+      formData.append('image', productImageFile);
+      formData.append('description', productName);
+
+      const token = localStorage.getItem("token");
+
+      const imageRes = await fetch(`${API_URL}/images/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const imageResult = await imageRes.json();
+
+      if (!imageRes.ok) {
+        throw new Error(imageResult.error || "Fallo al subir la imagen a Cloudinary.");
+      }
+
+      const imageUrl = imageResult.path_image; // URL de Cloudinary
+
+      //  creación de producto cloudinary
+      const productData = {
+        name: productName,
+        description: productDescription,
+        base_price: parseFloat(basePrice),
+        category_id: parseInt(categoryId),
+        image_url: imageUrl,
+      };
+
+      const productRes = await fetch(`${API_URL}/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(productData),
+      });
+
+      const productResult = await productRes.json();
+
+      if (!productRes.ok) {
+        throw new Error(productResult.msg || "Fallo al crear el producto.");
+      }
+
+      setSuccessMsg(`Producto '${productResult.product.name}' creado con éxito.`);
+
+      setTimeout(() => {
+        setIsCreating(false);
+        setProductName('');
+        setBasePrice('');
+        setCategoryId('');
+        setProductImageFile(null);
+        setSuccessMsg(null);
+
+      }, 2000);
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const location = useLocation();
 
   const products = [
@@ -16,11 +118,10 @@ export const Admin = () => {
   const isActive = (path) => location.pathname === path;
 
   const linkClass = (path) =>
-    `btn text-start d-flex align-items-center gap-2 ${
-      isActive(path) ? "btn-light text-dark" : "btn-dark text-white border-0"
+    `btn text-start d-flex align-items-center gap-2 ${isActive(path) ? "btn-light text-dark" : "btn-dark text-white border-0"
     }`;
 
-  const isProductsPage = location.pathname === "/admin"; 
+  const isProductsPage = location.pathname === "/admin";
 
   return (
     <div className="container-fluid">
@@ -50,50 +151,112 @@ export const Admin = () => {
 
         {/* CONTENT */}
         <main className="col-12 col-md-9 col-lg-10 bg-light p-4">
-       
+
           {isProductsPage ? (
-            <>
+
+            <>  {/* agrego agrego condicional para crear nvo producto -eb */}
+
               <div className="d-flex justify-content-between align-items-center mb-4">
-                <h5 className="mb-0">Gestión de Productos</h5>
+                <h5 className="mb-0">{isCreating ? 'Crear nuevo producto' : 'Gestión de productos'} </h5>
 
-                <button className="btn btn-dark d-flex align-items-center gap-2">
-                  <FaPlus /> Crear Producto
-                </button>
+                {/* crear nuevo producto -eb */}
+
+                {!isCreating && (
+
+                  <button className="btn btn-dark d-flex align-items-center gap-2" onClick={() => setIsCreating(true)}>
+                    <FaPlus /> Crear Producto
+                  </button>
+                )}
               </div>
+              {/* condicional para mostrar el form y form de creación de producto*/}
+              {isCreating ? (
 
-              <div className="table-responsive">
-                <table className="table align-middle">
-                  <thead>
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Precio</th>
-                      <th>Categoría</th>
-                      <th className="text-end">Opciones</th>
-                    </tr>
-                  </thead>
+                <div className="card p-4">
+                  <form onSubmit={handleCreateProduct}>
+                    <div className="mb-3">
+                      <label className="form-label">Nombre del Producto</label>
+                      <input type="text" className="form-control" value={productName} onChange={(e) => setProductName(e.target.value)} required />
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Descripción del Producto</label>
+                      <textarea
+                        className="form-control"
+                        rows="3"
+                        value={productDescription}
+                        onChange={(e) => setProductDescription(e.target.value)}
+                      ></textarea>
+                    </div>
+                    <div className="mb-3">
+                      <label className="form-label">Precio Base</label>
+                      <input type="number" className="form-control" value={basePrice} onChange={(e) => setBasePrice(e.target.value)} required />
+                    </div>
 
-                  <tbody>
-                    {products.map((p) => (
-                      <tr key={p.id}>
-                        <td>{p.name}</td>
-                        <td>{p.price}</td>
-                        <td>{p.category}</td>
-                        <td className="text-end">
-                          <button className="btn btn-link text-dark" title="Editar">
-                            <FaPen />
-                          </button>
-                          <button className="btn btn-link text-danger" title="Eliminar">
-                            <FaTrash />
-                          </button>
-                        </td>
+                    {/* img */}
+
+                    <div className="mb-3">
+                      <label className="form-label">Imagen del Producto</label>
+                      <input
+                        type="file"
+                        className="form-control"
+                        onChange={(e) => setProductImageFile(e.target.files[0])}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-3">
+                      <label className="form-label">Categoría</label>
+                      <input type="text" className="form-control" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} required />
+                    </div>
+
+
+                    {error && <div className="alert alert-danger">{error}</div>}
+                    {successMsg && <div className="alert alert-success">{successMsg}</div>}
+
+                    <div className="d-flex gap-2 mt-4">
+                      <button type="submit" className="btn btn-success" disabled={loading}>
+                        {loading ? 'Procesando...' : <><FaPlus /> Subir y Crear Producto</>}
+                      </button>
+                      <button type="button" className="btn btn-secondary" onClick={() => setIsCreating(false)} disabled={loading}>
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+
+                <div className="table-responsive">
+                  <table className="table align-middle">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Categoría</th>
+                        <th className="text-end">Opciones</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+
+                    <tbody>
+                      {products.map((p) => (
+                        <tr key={p.id}>
+                          <td>{p.name}</td>
+                          <td>{p.price}</td>
+                          <td>{p.category}</td>
+                          <td className="text-end">
+                            <button className="btn btn-link text-dark" title="Editar">
+                              <FaPen />
+                            </button>
+                            <button className="btn btn-link text-danger" title="Eliminar">
+                              <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </>
           ) : (
-           
             <Outlet />
           )}
         </main>
