@@ -2,6 +2,8 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+import cloudinary  # cloudinary -eb
+import cloudinary.uploader  # cargador cloudinary -eb
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -14,6 +16,19 @@ from api.commands import setup_commands
 from api.auth_routes import auth
 from api.cart_routes import cart_order
 from api.product_routes import product
+from dotenv import load_dotenv  # config global cloudinary -eb
+from api.image_routes import image_bp  # rutas de imágenes -eb
+
+#configuración api cloudinary -eb
+
+load_dotenv()
+
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    secure=True
+)
 
 # from models import Person
 
@@ -36,8 +51,8 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["JWT_SECRET_KEY"] = "my_secret_key"
 
-MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+MIGRATE = Migrate(app, db, compare_type=True)
 
 # JWT
 jwt = JWTManager(app)
@@ -49,21 +64,20 @@ setup_admin(app)
 setup_commands(app)
 
 
-
 # Importar los Blueprints DESPUÉS de inicializar 'app' y 'db'
-from api.auth_routes import auth
-from api.cart_routes import cart_order
-from api.product_routes import product
 
 # Add all endpoints form the API with a "api" prefix
 app.register_blueprint(auth, url_prefix='/api/auth')
 
 # Registrar rutas de productos
-app.register_blueprint(product, url_prefix='/api/') 
+app.register_blueprint(product, url_prefix='/api/')
 
 # Registrar rutas de carrito/pedidos
-app.register_blueprint(cart_order, url_prefix='/api/') 
+app.register_blueprint(cart_order, url_prefix='/api/')
 
+
+# Registrar rutas relacionadas con las imágenes (galería, subida y eliminación)
+app.register_blueprint(image_bp, url_prefix='/api') 
 
 # Handle/serialize errors like a JSON object
 
@@ -82,6 +96,8 @@ def sitemap():
     return send_from_directory(static_file_dir, 'index.html')
 
 # any other endpoint will try to serve it like a static file
+
+
 @app.route('/<path:path>', methods=['GET'])
 def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):

@@ -233,13 +233,26 @@ class ProductImage(db.Model):
     url = db.Column(db.String(500), nullable=False)
     is_main = db.Column(db.Boolean, default=False) # Si es la imagen principal
     product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable=False)
+    public_id = db.Column(db.String(100), nullable=False)
     
     def serialize(self):
         return {
             "id": self.id,
             "url": self.url,
             "is_main": self.is_main,
+            "public_id": self.public_id
         }
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 class Subcategory(db.Model):
     __tablename__ = "subcategories"
