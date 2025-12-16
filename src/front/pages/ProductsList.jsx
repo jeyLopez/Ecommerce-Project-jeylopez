@@ -273,15 +273,20 @@ export const ProductsList = () => {
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
             <h4 className="mb-2 mb-md-0">Todos los Productos</h4>
 
-            <div className="d-flex align-items-center gap-2">
+            {/* <div className="d-flex align-items-center gap-2">
               <span className="small text-muted">Ordenar por</span>
               <select className="form-select form-select-sm" style={{ maxWidth: "180px" }} disabled>
                 <option>Más recientes</option>
+              <select
+                className="form-select form-select-sm"
+                style={{ maxWidth: "180px" }}
+              >
+               <option>Más recientes</option>
                 <option>Precio: menor a mayor</option>
                 <option>Precio: mayor a menor</option>
               </select>
-            </div>
-          </div>
+            </div>*/}
+          </div> 
 
           <div className="small text-muted mb-2">
             Total cargados: {filteredProducts.length}
