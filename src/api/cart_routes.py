@@ -186,6 +186,8 @@ def checkout():
             region=region,
             zip_code=zip_code,
         )
+        
+        
         db.session.add(new_order)
         db.session.flush()
 
@@ -227,9 +229,9 @@ def checkout():
     except ValueError as e:
         db.session.rollback()
         return jsonify({"msg": f"Error de inventario: {str(e)}"}), 400
-    except IntegrityError:
+    except IntegrityError as e:
         db.session.rollback()
-        return jsonify({"msg": "Error al procesar la orden debido a un problema de la base de datos."}), 500
+        return jsonify({"msg": "Error al procesar la orden debido a un problema de la base de datos., " + str(e)}), 500
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": f"Ocurrió un error inesperado: {str(e)}"}), 500

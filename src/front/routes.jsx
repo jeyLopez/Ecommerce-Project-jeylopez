@@ -13,6 +13,7 @@ import { Favorites } from "./pages/Favorites";
 import { ProductDetails } from "./components/ProductDetails";
 import { ProductsList } from "./pages/ProductsList";
 import { Admin } from "./pages/Admin";
+import { AdminRoute } from "./pages/AdminRoute";
 import { Variants } from "./pages/Variants";
 import { Orders } from "./pages/Orders";
 import { Users } from "./pages/Users";
@@ -77,6 +78,13 @@ export const router = createBrowserRouter(
         <Route path="orders" element={<Orders />} />
         <Route path="users" element={<Users />} />
       </Route>
+      <Route path="/admin/*"
+        element={
+          <AdminRoute>
+            <Admin />
+          </AdminRoute>
+        }
+      />
 
 
       <Route path="login" element={<Login />} />

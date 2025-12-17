@@ -17,13 +17,36 @@ product = Blueprint('shop_catalog', __name__)
 def get_products():
     # Lógica para filtrar
     category = request.args.get("category")
+    subcategory_id = request.args.get("subcategory_id")
+    size = request.args.get("size")
+    color = request.args.get("color")
+
+    # Iniciar consulta base
     query = Product.query
-    
+
+    # Filtrar por categoría
     if category:
         query = query.join(Category).filter(Category.name == category)
-    products = query.all()
+    
+    # Filtrar por subcayegoria
+    if subcategory_id:
+        query = query.filter(Product.subcategory_id == subcategory_id)
+    
+    # 4. Filtrar por Variantes (Talla y/o Color)
+    # Si viene alguno de estos, necesitamos hacer un join con la tabla Variant
+    if size or color:
+        query = query.join(Variant)
+        if size:
+            query = query.filter(Variant.size == size)
+        if color:
+            query = query.filter(Variant.color == color)
+
+    # Evitar duplicados
+    #products = query.all()
+    products = query.distinct().all()
+
     # Incluimos variantes de productos (tallas, colores, ect) en la vista general para que el cliente sepa qué opciones hay
-    return jsonify([p.serialize(include_variants=True) for p in products])
+    return jsonify([p.serialize(include_variants=True) for p in products]), 200
 
 # Traer un solo producto con sus variantes tallas, color, etc
 

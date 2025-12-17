@@ -1,4 +1,4 @@
-import React, { useState } from "react"; //estado-eb
+import React, { useState, useEffect } from "react"; //estado-eb
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom"; //navegación-eb
 import { FaBox, FaLayerGroup, FaClipboardList, FaUsers } from "react-icons/fa";
 import { FaPlus, FaTrash, FaPen } from "react-icons/fa6";
@@ -21,12 +21,39 @@ export const Admin = () => {
   const [successMsg, setSuccessMsg] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
 
+  // productos cargados desde backend
+  const [products, setProducts] = useState([]);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   // url backend
-  const API_URL = "https://potential-journey-455qr9vw4xph76qv-3001.app.github.dev/api";
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  const token = localStorage.getItem("token");
 
-  // función doble, para subir y crear - eb
+  // cargar productos desde backend
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/products`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) {
+          throw new Error("Error al cargar productos");
+        }
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error("Error cargando productos:", err);
+      }
+    };
+    fetchProducts();
+  }, [API_URL, token]);
+
+  // función doble, para subir y crear - producto
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();
@@ -49,7 +76,7 @@ export const Admin = () => {
       formData.append('image', productImageFile);
       formData.append('description', productName);
 
-      const token = localStorage.getItem("token");
+      //const token = localStorage.getItem("token");
 
       const imageRes = await fetch(`${API_URL}/images/image/upload`, {
         method: 'POST',
@@ -90,6 +117,9 @@ export const Admin = () => {
 
       setSuccessMsg(`Producto '${productResult.product.name}' creado con éxito.`);
 
+      // actualizar lista local
+      setProducts((prev) => [productResult.product, ...prev]);
+
       setTimeout(() => {
         setIsCreating(false);
         setProductName('');
@@ -106,14 +136,6 @@ export const Admin = () => {
       setLoading(false);
     }
   };
-
-  const location = useLocation();
-
-  const products = [
-    { id: 1, name: "Vestido Elegante", price: "€129.99", category: "Mujer" },
-    { id: 2, name: "Camisa Casual", price: "€49.99", category: "Hombre" },
-    { id: 3, name: "Chaqueta Urbana", price: "€139.99", category: "Hombre" },
-  ];
 
   const isActive = (path) => location.pathname === path;
 
