@@ -3,11 +3,11 @@ import { Card } from "../components/Card.jsx";
 import { Carousel } from "../components/Carousel";
 import useGlobalReducer from "../hooks/useGlobalReducer";
 import { addToCart } from "../actions";
-import { useFavorites } from "../components/FavoritesContext.jsx"; 
+import { useFavorites } from "../components/FavoritesContext.jsx";
 
 export const Home = () => {
   const { store, dispatch } = useGlobalReducer();
-  const { favorites, toggleFavorite } = useFavorites(); 
+  const { favorites, toggleFavorite } = useFavorites();
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -23,6 +23,7 @@ export const Home = () => {
           },
         });
         const data = await res.json();
+        //console.log("Productos desde la API:", data);
         setProducts(data || []);
       } catch (err) {
         console.error("Error cargando productos:", err);
@@ -84,10 +85,10 @@ export const Home = () => {
                   name={product.name}
                   price={formatCLP(product.base_price)}
                   image={product.gallery && product.gallery.length > 0 ? product.gallery[0].url : null} //cambio para ver imagen
-                  isFavorite={favorites.includes(product.id)}  
-                  onToggleFavorite={() => toggleFavorite(product.id)} 
+                  isFavorite={favorites.includes(product.id)}
+                  onToggleFavorite={() => toggleFavorite(product.id)}
                   onAddToCart={(quantity) => handleAddToCart(product, quantity)}
-                  disabled={!store.auth.isLoggedIn}git
+                  disabled={!store.auth.isLoggedIn} git
                 />
               </div>
             ))}
@@ -105,8 +106,8 @@ export const Home = () => {
                   name={product.name}
                   price={formatCLP(product.base_price)}
                   image={product.gallery && product.gallery.length > 0 ? product.gallery[0].url : null} //cambio para ver imagen
-                  isFavorite={favorites.includes(product.id)}   
-                  onToggleFavorite={() => toggleFavorite(product.id)} 
+                  isFavorite={favorites.includes(product.id)}
+                  onToggleFavorite={() => toggleFavorite(product.id)}
                   onAddToCart={(quantity) => handleAddToCart(product, quantity)}
                   disabled={!store.auth.isLoggedIn}
                 />
@@ -118,12 +119,6 @@ export const Home = () => {
     </>
   );
 };
-
-
-
-
-
-
 
 
 
